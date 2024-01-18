@@ -1,6 +1,6 @@
 # Flipper-Ino-A03
 
-## Donate Me At
+## Support Me At
 - `bitcoin`: bc1q0dl24vs9w3rkpwplc9wwlhh0qpglu26esw3mrq
   
 ## What is it?
