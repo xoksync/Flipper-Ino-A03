@@ -4,7 +4,7 @@
 - `bitcoin`: bc1q0dl24vs9w3rkpwplc9wwlhh0qpglu26esw3mrq
   
 ## What is it?
-A firmware to simulate Flipper Zero firmware; it's only for study purposes, but you can do real functions with it.
+A firmware to simulate gadget cybersecurity; it's only for study purposes, but you can do real functions using modules like BMP280 with it.
 This is an experimental project, it is in the early stages, and I intend to improve it so that we can work with cybersecurity in an inexpensive and comprehensive manner.
 
 ## Requirements To Compile
