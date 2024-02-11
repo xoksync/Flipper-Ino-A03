@@ -1,4 +1,4 @@
-# Flipper-Ino-A03 - 0.0.1b
+# Flipper-Ino-A03 - 0.0.2b
 
 ## Support Me At
 - `bitcoin`: bc1q0dl24vs9w3rkpwplc9wwlhh0qpglu26esw3mrq

@@ -12,17 +12,14 @@ void Display::create() noexcept
   this->__u8g->setColorIndex(1);
   this->__u8g->setFont(FONT_INSTANCE);
 }
-
 void Display::draw(const Drawable &drawable) const noexcept
 {
   drawable.__draw(this->__u8g);
 }
-
 void Display::firstPage() noexcept
 {
   this->__u8g->firstPage();
 }
-
 const int Display::nextPage() noexcept
 {
   return this->__u8g->nextPage();

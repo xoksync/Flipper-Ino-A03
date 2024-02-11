@@ -18,7 +18,6 @@ void MenuSystem::addOption(Menu::Option option) noexcept
 {
   this->__options.push_back(option);
 }
-
 void MenuSystem::moveCursor(uint8_t direction) noexcept
 {
   this->__cursor_index += direction;

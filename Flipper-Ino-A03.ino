@@ -13,16 +13,30 @@
 #include "Button.hpp"
 
 Display display;
-uint32_t system_running_tick;
-Button down(4), up(6), enter(5);
-MenuSystem menu_system_home, menu_system_tools;
-Page *current_page_buffer;
 
+Page *current_page_buffer;
 Adafruit_BMP280 bmp;
 
-namespace Pages
-{ Page home, tools, about, bitcoin, temperature; };
+uint32_t system_running_tick;
+Button down(4), up(6), enter(5);
 
+namespace Pages
+{
+	Page
+		home, tools, about,
+		btc_wallet, temperature;
+};
+
+MenuSystem
+	menu_system_home, menu_system_tools;
+
+
+void setup_buttons() noexcept
+{
+	down.setup();
+	up.setup();
+	enter.setup();
+}
 void boot_system() noexcept
 {
 	display.firstPage(); do {
@@ -31,48 +45,39 @@ void boot_system() noexcept
 
 	while(!bmp.begin(0x76)) { delay(100); }
 
-	down.setup();
-	up.setup();
-	enter.setup();
+	setup_buttons();
 
-	// prevent some issues
 	delay(2000);
 }
 void switchPage(Page &page) noexcept
 {
 	current_page_buffer = &page;
 }
-
 void setup(void)
 {
 	display.create();
 	switchPage(Pages::home);
 	boot_system();
 
-	#pragma region Menu Options_Setup
+#pragma region Menu Options_Setup
+	// - Home Menu
 	menu_system_home.setDisplay(&display);
 	menu_system_home.addOption(Menu::Option("Tools", ICON_TOOLS, []()->void{switchPage(Pages::tools);}));
-	//menu_system_home.addOption(Menu::Option("Setting", ICON_SETTING));
-	//menu_system_home.addOption(Menu::Option("Pluggins", ICON_PLUGGIN));
-	//menu_system_home.addOption(Menu::Option("Clock Mode", ICON_CLOCK));
-	//menu_system_home.addOption(Menu::Option("Wi-Fi", ICON_WIFI));
-	//menu_system_home.addOption(Menu::Option("Encrypt", ICON_ENCRYPT));
 	menu_system_home.addOption(Menu::Option("About", ICON_ABOUT,  []()->void{switchPage(Pages::about);}));
 
+	// - Tools Menu
 	menu_system_tools.setDisplay(&display);
-	//menu_system_tools.addOption(Menu::Option("Bad USB", ICON_SCRIPT));
-	//menu_system_tools.addOption(Menu::Option("Wi-Fi Spam", ICON_SCRIPT));
-	//menu_system_tools.addOption(Menu::Option("DAUTHER", ICON_SCRIPT));
 	menu_system_tools.addOption(Menu::Option("Temperature", ICON_SCRIPT, []()->void{switchPage(Pages::temperature);}));
-	menu_system_tools.addOption(Menu::Option("Bitcoin Wallet", ICON_SCRIPT, []()->void{switchPage(Pages::bitcoin);}));
+	menu_system_tools.addOption(Menu::Option("BTC Wallet", ICON_SCRIPT, []()->void{switchPage(Pages::btc_wallet);}));
 	menu_system_tools.addOption(Menu::Option("Back", ICON_BACK, []()->void{switchPage(Pages::home);}));
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Pages_Creation
-	Pages::bitcoin.create([]()->void{
+#pragma region Pages_Creation
+	Pages::btc_wallet.create([]()->void{
 		display.firstPage(); do {
 			display.draw(Texture(PLEASE_DONT_SEND_BITCOIN, 128, 64));
 		} while( display.nextPage() );
+		
 		if(enter.isPressed()){ delay(250); switchPage(Pages::tools); }
 	});
 
@@ -82,6 +87,7 @@ void setup(void)
 			display.draw(Text(("Pres: " + String(bmp.readPressure()) + " ").c_str(), 12, FONT_HEIGHT * 2));
 			display.draw(Text(("Alti: " + String(bmp.readAltitude(1013.25)) + "m").c_str(), 12, FONT_HEIGHT * 3));
 		} while( display.nextPage() );
+
 		if(enter.isPressed()){ delay(250); switchPage(Pages::tools); }
 	});
 
@@ -93,18 +99,14 @@ void setup(void)
 	});
 
 	Pages::about.create([]()->void {
-		static int seconds = 5;
 		display.firstPage(); do {
 			display.draw(Text("Created by X-okSync", 0, FONT_HEIGHT));
 			display.draw(Text("Version: 0.0.1", 0, FONT_HEIGHT * 2));
-			display.draw(Text(("Exting " + String(seconds) + "...").c_str(), 0, FONT_HEIGHT * 5));
+			display.draw(Text("Exting in 5s...", 0, FONT_HEIGHT * 5));
 		} while( display.nextPage() );
-		delay(1000);
-		if(seconds-- == 1)
-		{
-			seconds = 5;
-			switchPage(Pages::home);
-		}
+		
+		delay(5000);
+		switchPage(Pages::home);
 	});
 	
 	Pages::home.create([]()->void {
@@ -113,12 +115,12 @@ void setup(void)
 			display.draw(menu_system_home);
 		} while( display.nextPage());
 	});
-	#pragma endregion
+#pragma endregion
 }
 
 void loop(void)
 {
   current_page_buffer->loop();
-	delay(1000 / 30);
+	delay(FPS);
 }
 
